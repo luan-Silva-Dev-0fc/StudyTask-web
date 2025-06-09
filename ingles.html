@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Atividades</title>
+  <style>
+    /* Reset básico */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      color: #e1e8ed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overscroll-behavior: none;
+    }
+    #app {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 4px;
+    }
+    form#publishForm {
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .file-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .file-input-wrapper input[type="file"] {
+      display: none;
+    }
+    .file-input-wrapper button {
+      background: #2a2a2a;
+      color: #ddd;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      user-select: none;
+      touch-action: manipulation;
+      min-width: 120px;
+      text-align: center;
+    }
+    .file-input-wrapper button:hover {
+      background: #3a3a3a;
+      transform: scale(1.02);
+    }
+    .file-input-wrapper button:active {
+      transform: scale(1);
+    }
+    .file-input-wrapper .file-name {
+      font-size: 0.85rem;
+      color: #8899a6;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    form#publishForm textarea {
+      background: #121212;
+      border-radius: 8px;
+      border: none;
+      padding: 12px;
+      color: #e1e8ed;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 80px;
+      font-weight: 500;
+      font-family: inherit;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+    form#publishForm textarea::placeholder {
+      color: #657786;
+    }
+    form#publishForm textarea:focus {
+      outline: none;
+      background-color: #1a1a1a;
+      border: 1px solid #1da1f2;
+    }
+    form#publishForm button[type="submit"] {
+      align-self: flex-end;
+      background: #1da1f2;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 10px 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      box-shadow: 0 2px 6px rgb(29 161 242 / 0.5);
+      user-select: none;
+      touch-action: manipulation;
+      min-width: 80px;
+    }
+    form#publishForm button[type="submit"]:hover:not(:disabled) {
+      background: #0d8ddb;
+      transform: scale(1.02);
+    }
+    form#publishForm button[type="submit"]:disabled {
+      background: #4a90a8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    form#publishForm button[type="submit"]:active {
+      transform: scale(1);
+    }
+    #postsContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .post {
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .post img {
+      width: 100%;
+      border-radius: 10px;
+      object-fit: cover;
+      user-select: none;
+      max-height: 250px;
+    }
+    .post .caption {
+      font-size: 0.95rem;
+      color: #e1e8ed;
+      white-space: pre-wrap;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .post .date {
+      font-size: 0.8rem;
+      color: #8899a6;
+    }
+    .post .actions {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 8px;
+      border-top: 1px solid #2f3336;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .post .actions button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: #8899a6;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 9999px;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+      user-select: none;
+      touch-action: manipulation;
+      min-width: 80px;
+      justify-content: center;
+    }
+    .post .actions button svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    .post .actions button:hover {
+      background-color: rgba(29, 161, 242, 0.1);
+      color: #1da1f2;
+      transform: scale(1.05);
+    }
+    .post .actions .like-btn:hover,
+    .post .actions .like-btn.liked {
+      color: #e0245e;
+      background-color: rgba(224, 36, 94, 0.1);
+    }
+    .post .actions button:active {
+      transform: scale(1);
+    }
+    .like-count {
+      user-select: none;
+    }
+    .comments-section {
+      margin-top: 10px;
+      border-top: 1px solid #2f3336;
+      padding-top: 10px;
+    }
+    .comments-list {
+      max-height: 120px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .comment {
+      background: #222;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      color: #cfd9de;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+    .comment-form {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .comment-form input {
+      flex: 1;
+      background: #121212;
+      border-radius: 16px;
+      border: 1px solid #2f3336;
+      padding: 8px 12px;
+      color: #e1e8ed;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      transition: border-color 0.2s ease;
+    }
+    .comment-form input::placeholder {
+      color: #657786;
+    }
+    .comment-form input:focus {
+      outline: none;
+      border-color: #1da1f2;
+      background-color: #1a1a1a;
+    }
+    .comment-form button {
+      background: #1da1f2;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 8px 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgb(29 161 242 / 0.5);
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      touch-action: manipulation;
+      min-width: 70px;
+    }
+    .comment-form button:hover:not(:disabled) {
+      background: #0d8ddb;
+      transform: scale(1.02);
+    }
+    .comment-form button:disabled {
+      background: #4a90a8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .comment-form button:active {
+      transform: scale(1);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .modal-content {
+      background: #1c1c1c;
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 90%;
+      width: 320px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+    .modal-content p {
+      margin: 0 0 12px;
+      font-size: 0.9rem;
+      color: #e1e8ed;
+      line-height: 1.4;
+    }
+    .modal-content button {
+      background: #1da1f2;
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      padding: 8px 16px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      touch-action: manipulation;
+    }
+    .modal-content button:hover {
+      background: #0d8ddb;
+      transform: scale(1.02);
+    }
+    .modal-content button:active {
+      transform: scale(1);
+    }
+    .comments-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .comments-list::-webkit-scrollbar-thumb {
+      background: #1da1f2;
+      border-radius: 4px;
+    }
+    .comments-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    /* Estilos para carrossel e tela cheia */
+    .carousel {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+    .carousel-images {
+      display: flex;
+      transition: transform 0.3s ease;
+    }
+    .carousel-images img {
+      width: 100%;
+      flex-shrink: 0;
+      border-radius: 10px;
+      object-fit: cover;
+      max-height: 250px;
+      cursor: pointer;
+    }
+    .carousel-nav {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+    .carousel-nav button {
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .carousel-nav button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .fullscreen-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+    .fullscreen-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transform-origin: center center;
+      transition: transform 0.2s ease;
+    }
+    .fullscreen-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .fullscreen-nav {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+    }
+    .fullscreen-nav button {
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .fullscreen-nav button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 6px;
+      }
+      #app {
+        padding: 0 2px;
+      }
+      form#publishForm {
+        padding: 10px;
+      }
+      .file-input-wrapper button {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        min-width: 100px;
+      }
+      .file-input-wrapper .file-name {
+        font-size: 0.8rem;
+        max-width: 150px;
+      }
+      form#publishForm textarea {
+        min-height: 90px;
+        font-size: 0.9rem;
+        padding: 10px;
+      }
+      form#publishForm button[type="submit"] {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        min-width: 70px;
+      }
+      .post {
+        padding: 10px;
+      }
+      .post img {
+        max-height: 200px;
+      }
+      .post .caption {
+        font-size: 0.9rem;
+      }
+      .post .date {
+        font-size: 0.75rem;
+      }
+      .post .actions {
+        gap: 2px;
+        justify-content: space-around;
+      }
+      .post .actions button {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+        min-width: 60px;
+      }
+      .post .actions button svg {
+        width: 16px;
+        height: 16px;
+      }
+      .comment-form input {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+      }
+      .comment-form button {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        min-width: 60px;
+      }
+      .comment {
+        font-size: 0.85rem;
+        padding: 6px 10px;
+      }
+      .comments-list {
+        max-height: 100px;
+      }
+      .modal-content {
+        padding: 12px;
+        max-width: 95%;
+        width: 280px;
+      }
+      .modal-content p {
+        font-size: 0.85rem;
+      }
+      .modal-content button {
+        padding: 6px 12px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <form id="publishForm">
+      <div class="file-input-wrapper">
+        <input type="file" id="imageInput" accept="image/*" multiple required aria-label="Selecionar atividade" />
+        <button type="button" id="customFileButton">Escolher a atividade</button>
+        <span class="file-name" id="fileName">Nenhum arquivo selecionado</span>
+      </div>
+      <textarea id="captionInput" placeholder="Escreva uma legenda..." maxlength="280" aria-label="Legenda da atividade"></textarea>
+      <button type="submit" disabled>Publicar</button>
+    </form>
+    <div id="postsContainer"></div>
+  </div>
+  <div class="modal" id="alertModal">
+    <div class="modal-content">
+      <p id="alertMessage"></p>
+      <button id="alertClose">OK</button>
+    </div>
+  </div>
+  <!-- Modal para tela cheia -->
+  <div class="fullscreen-modal" id="fullscreenModal">
+    <img id="fullscreenImage" class="fullscreen-image" src="#" alt="Imagem em tela cheia" />
+    <button class="fullscreen-close" id="fullscreenClose">X</button>
+    <div class="fullscreen-nav">
+      <button id="fullscreenPrev">←</button>
+      <button id="fullscreenNext">→</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove, getDoc } from "https://www.gstatic.com/firebasejs/9.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8Tv1kGl6Upx_iBAB6GBECarj_F38bYG8",
+      authDomain: "studytask-ad7e1.firebaseapp.com",
+      projectId: "studytask-ad7e1",
+      storageBucket: "studytask-ad7e1.firebasestorage.app",
+      messagingSenderId: "62674745069",
+      appId: "1:62674745069:web:895dec52dc9787d0b33ee4",
+      measurementId: "G-4MXD0J65H6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const publishForm = document.getElementById("publishForm");
+    const imageInput = document.getElementById("imageInput");
+    const customFileButton = document.getElementById("customFileButton");
+    const fileNameDisplay = document.getElementById("fileName");
+    const captionInput = document.getElementById("captionInput");
+    const publishButton = publishForm.querySelector("button[type='submit']");
+    const postsContainer = document.getElementById("postsContainer");
+    const alertModal = document.getElementById("alertModal");
+    const alertMessage = document.getElementById("alertMessage");
+    const alertClose = document.getElementById("alertClose");
+
+    let selectedImageDataURLs = [];
+
+    // Botão personalizado para escolher arquivo
+    customFileButton.addEventListener("click", () => {
+      imageInput.click();
+    });
+
+    // Atualizar nome do arquivo selecionado e validar Base64
+    imageInput.addEventListener("change", () => {
+  selectedImageDataURLs = [];
+  const files = Array.from(imageInput.files);
+  if (files.length > 0) {
+    if (files.length > 4) {
+      showAlert("Você pode selecionar no máximo 4 imagens.");
+      fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+      selectedImageDataURLs = [];
+      publishButton.disabled = true;
+      return;
+    }
+    let totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    if (totalSize > 20 * 1024 * 1024) { // Alterado de 4 MB para 20 MB
+      showAlert("O tamanho total das imagens deve ser menor que 20MB.");
+      fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+      selectedImageDataURLs = [];
+      publishButton.disabled = true;
+      return;
+    }
+    fileNameDisplay.textContent = files.length === 1 ? files[0].name : `${files.length} imagens selecionadas`;
+    const readPromises = files.map(file => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          let base64String = e.target.result;
+          if (base64String.startsWith("data:image")) {
+            base64String = base64String.split(",")[1];
+          }
+          resolve(base64String);
+        };
+        reader.onerror = () => reject(new Error("Erro ao ler o arquivo."));
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(readPromises)
+      .then(base64Strings => {
+        // Verificação adicional para o limite do Firestore (1 MB por documento)
+        const totalBase64Size = base64Strings.reduce((sum, str) => sum + ((str.length * 3) / 4), 0);
+        if (totalBase64Size > 0.9 * 1024 * 1024) { // Aproximadamente 900 KB para deixar margem
+          showAlert("As imagens excedem o limite de tamanho para o banco de dados. Tente imagens menores ou use o Firebase Storage.");
+          fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+          selectedImageDataURLs = [];
+          publishButton.disabled = true;
+          return;
+        }
+        selectedImageDataURLs = base64Strings;
+        publishButton.disabled = false;
+      })
+      .catch(error => {
+        showAlert(error.message);
+        fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+        selectedImageDataURLs = [];
+        publishButton.disabled = true;
+      });
+  } else {
+    fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+    selectedImageDataURLs = [];
+    publishButton.disabled = true;
+  }
+});
+
+    function showAlert(message) {
+      alertMessage.textContent = message;
+      alertModal.style.display = "flex";
+      alertClose.focus();
+    }
+
+    alertClose.addEventListener("click", () => {
+      alertModal.style.display = "none";
+    });
+
+    document.addEventListener("keydown", e => {
+      if (alertModal.style.display === "flex" && (e.key === "Enter" || e.key === "Escape")) {
+        alertModal.style.display = "none";
+      }
+    });
+
+    function formatDate(timestamp) {
+      const date = timestamp?.toDate ? timestamp.toDate() : new Date();
+      return date.toLocaleString("pt-BR", {
+        day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    // Modal de tela cheia
+    const fullscreenModal = document.getElementById("fullscreenModal");
+    const fullscreenImage = document.getElementById("fullscreenImage");
+    const fullscreenClose = document.getElementById("fullscreenClose");
+    const fullscreenPrev = document.getElementById("fullscreenPrev");
+    const fullscreenNext = document.getElementById("fullscreenNext");
+    let currentFullscreenImages = [];
+    let currentFullscreenIndex = 0;
+
+    function createPostElement(postData, postId) {
+      const postEl = document.createElement("article");
+      postEl.className = "post";
+      postEl.dataset.id = postId;
+
+      // Suporte para múltiplas imagens
+      const images = Array.isArray(postData.imageBase64) ? postData.imageBase64 : [postData.imageBase64].filter(Boolean);
+      const carouselId = `carousel-${postId}`;
+      let imageHTML = images.length > 1 ? `
+        <div class="carousel" id="${carouselId}">
+          <div class="carousel-images">
+            ${images.map(img => `<img src="data:image/jpeg;base64,${img}" alt="Atividade publicada" loading="lazy" />`).join('')}
+          </div>
+          <div class="carousel-nav">
+            <button class="prev" aria-label="Imagem anterior">←</button>
+            <button class="next" aria-label="Próxima imagem">→</button>
+          </div>
+        </div>
+      ` : `<img src="data:image/jpeg;base64,${images[0]}" alt="Atividade publicada" loading="lazy" />`;
+
+      postEl.innerHTML = `
+        ${imageHTML}
+        <div class="caption">${postData.caption || ""}</div>
+        <div class="date">${formatDate(postData.createdAt)}</div>
+        <div class="actions">
+          <button class="like-btn" aria-label="Curtir atividade">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6.42 3.42 5 5.5 5c1.54 0 2.96 1.1 3.5 2.44C9.54 6.1 10.96 5 12.5 5 14.58 5 16 6.42 16 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+            <span class="like-count">${Array.isArray(postData.likes) ? postData.likes.length : 0}</span>
+          </button>
+          <button class="download-btn" aria-label="Baixar atividade">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"></path></svg>
+            <span>Baixar</span>
+          </button>
+          <button class="share-btn" aria-label="Compartilhar atividade">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8.59L13.41 13.17 15.83 15.59 21 10.41 18 8.59zM6 18h12v-2H6v2zm7-14H7v2h6v-2zm1 8l-3 3v-6l3 3z"></path></svg>
+            <span>Compartilhar</span>
+          </button>
+        </div>
+        <section class="comments-section">
+          <div class="comments-list"></div>
+          <form class="comment-form">
+            <input type="text" placeholder="Comentar..." maxlength="140" aria-label="Escrever comentário" />
+            <button type="submit" disabled>Enviar</button>
+          </form>
+        </section>
+      `;
+
+      // Configuração do carrossel
+      if (images.length > 1) {
+        const carousel = postEl.querySelector(`#${carouselId}`);
+        const carouselImages = carousel.querySelector(".carousel-images");
+        const prevBtn = carousel.querySelector(".prev");
+        const nextBtn = carousel.querySelector(".next");
+        let currentIndex = 0;
+
+        function updateCarousel() {
+          carouselImages.style.transform = `translateX(-${currentIndex * 100}%)`;
+          prevBtn.disabled = currentIndex === 0;
+          nextBtn.disabled = currentIndex === images.length - 1;
+        }
+
+        prevBtn.addEventListener("click", () => {
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateCarousel();
+          }
+        });
+
+        nextBtn.addEventListener("click", () => {
+          if (currentIndex < images.length - 1) {
+            currentIndex++;
+            updateCarousel();
+          }
+        });
+      }
+
+      // Configuração de tela cheia
+      postEl.querySelectorAll("img").forEach((img, index) => {
+        img.addEventListener("click", () => {
+          currentFullscreenImages = images;
+          currentFullscreenIndex = index;
+          fullscreenImage.src = `data:image/jpeg;base64,${images[currentFullscreenIndex]}`;
+          fullscreenModal.style.display = "flex";
+          fullscreenImage.style.transform = "scale(1)";
+          updateFullscreenNav();
+        });
+      });
+
+      const likeBtn = postEl.querySelector(".like-btn");
+      likeBtn.addEventListener("click", async () => {
+        try {
+          const postRef = doc(db, "ingles", postId);
+          const postSnap = await getDoc(postRef);
+          if (!postSnap.exists()) {
+            showAlert("Atividade não encontrada.");
+            return;
+          }
+          let currentLikes = postSnap.data().likes || [];
+          if (!Array.isArray(currentLikes)) {
+            currentLikes = [];
+            await updateDoc(postRef, { likes: [] });
+          }
+          const userId = "anonymous";
+          if (currentLikes.includes(userId)) {
+            await updateDoc(postRef, { likes: arrayRemove(userId) });
+            postData.likes = currentLikes.filter(like => like !== userId);
+          } else {
+            await updateDoc(postRef, { likes: arrayUnion(userId) });
+            postData.likes = [...currentLikes, userId];
+          }
+          likeBtn.querySelector(".like-count").textContent = postData.likes.length;
+          likeBtn.classList.toggle("liked");
+        } catch (error) {
+          console.error("Erro ao curtir atividade:", error.message, { postId, postData });
+          if (error.code === "unavailable") {
+            showAlert("Sem conexão com a internet. Ação será sincronizada quando a conexão for restabelecida.");
+          } else {
+            showAlert(`Erro ao curtir a atividade: ${error.message || "Tente novamente."}`);
+          }
+        }
+      });
+
+      const downloadBtn = postEl.querySelector(".download-btn");
+      downloadBtn.addEventListener("click", () => {
+        try {
+          images.forEach((image, index) => {
+            const link = document.createElement("a");
+            link.href = `data:image/jpeg;base64,${image}`;
+            link.download = `atividade_${postId}_${index + 1}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          });
+        } catch (error) {
+          console.error("Erro ao baixar atividade:", error.message);
+          showAlert("Erro ao baixar a atividade: " + error.message);
+        }
+      });
+
+      const shareBtn = postEl.querySelector(".share-btn");
+      shareBtn.addEventListener("click", async () => {
+        try {
+          if (navigator.share) {
+            await navigator.share({
+              title: "Atividade",
+              text: postData.caption || "Confira essa atividade",
+              url: window.location.href,
+            });
+          } else {
+            showAlert("Compartilhamento não suportado neste navegador.");
+          }
+        } catch (error) {
+          console.error("Erro ao compartilhar atividade:", error.message);
+          showAlert("Erro ao compartilhar: " + error.message);
+        }
+      });
+
+      const commentsList = postEl.querySelector(".comments-list");
+      const commentForm = postEl.querySelector(".comment-form");
+      const commentInput = commentForm.querySelector("input");
+      const commentSubmit = commentForm.querySelector("button");
+
+      function renderComments() {
+        commentsList.innerHTML = "";
+        const comments = Array.isArray(postData.comments) ? postData.comments : [];
+        comments.forEach(c => {
+          const div = document.createElement("div");
+          div.className = "comment";
+          div.textContent = c;
+          commentsList.appendChild(div);
+        });
+      }
+      renderComments();
+
+      commentInput.addEventListener("input", () => {
+        commentSubmit.disabled = commentInput.value.trim() === "";
+      });
+
+      commentForm.addEventListener("submit", async e => {
+        e.preventDefault();
+        const commentText = commentInput.value.trim();
+        if (!commentText) return;
+        try {
+          const postRef = doc(db, "ingles", postId);
+          await updateDoc(postRef, { comments: arrayUnion(commentText) });
+          postData.comments = [...(Array.isArray(postData.comments) ? postData.comments : []), commentText];
+          renderComments();
+          commentInput.value = "";
+          commentSubmit.disabled = true;
+        } catch (error) {
+          console.error("Erro ao enviar comentário:", error.message);
+          if (error.code === "unavailable") {
+            showAlert("Sem conexão com a internet. Comentário será sincronizado quando a conexão for restabelecida.");
+          } else {
+            showAlert("Erro ao enviar comentário: " + error.message);
+          }
+        }
+      });
+
+      return postEl;
+    }
+
+    // Configuração da tela cheia
+    function updateFullscreenNav() {
+      fullscreenPrev.disabled = currentFullscreenIndex === 0;
+      fullscreenNext.disabled = currentFullscreenIndex === currentFullscreenImages.length - 1;
+    }
+
+    fullscreenClose.addEventListener("click", () => {
+      fullscreenModal.style.display = "none";
+      fullscreenImage.style.transform = "scale(1)";
+    });
+
+    fullscreenPrev.addEventListener("click", () => {
+      if (currentFullscreenIndex > 0) {
+        currentFullscreenIndex--;
+        fullscreenImage.src = `data:image/jpeg;base64,${currentFullscreenImages[currentFullscreenIndex]}`;
+        fullscreenImage.style.transform = "scale(1)";
+        updateFullscreenNav();
+      }
+    });
+
+    fullscreenNext.addEventListener("click", () => {
+      if (currentFullscreenIndex < currentFullscreenImages.length - 1) {
+        currentFullscreenIndex++;
+        fullscreenImage.src = `data:image/jpeg;base64,${currentFullscreenImages[currentFullscreenIndex]}`;
+        fullscreenImage.style.transform = "scale(1)";
+        updateFullscreenNav();
+      }
+    });
+
+    fullscreenImage.addEventListener("dblclick", () => {
+      const currentScale = parseFloat(fullscreenImage.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
+      fullscreenImage.style.transform = currentScale === 1 ? "scale(2)" : "scale(1)";
+    });
+
+    fullscreenImage.addEventListener("wheel", e => {
+      e.preventDefault();
+      const currentScale = parseFloat(fullscreenImage.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      const newScale = Math.max(1, Math.min(3, currentScale + delta));
+      fullscreenImage.style.transform = `scale(${newScale})`;
+    });
+
+    async function loadPosts() {
+      postsContainer.innerHTML = `<p style="color:#8899a6; text-align:center; padding:16px;">Carregando atividades...</p>`;
+      try {
+        const q = query(collection(db, "ingles"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+        postsContainer.innerHTML = "";
+        querySnapshot.forEach(docSnap => {
+          const postData = docSnap.data();
+          const postId = docSnap.id;
+          if (!Array.isArray(postData.likes)) {
+            postData.likes = [];
+          }
+          if (!Array.isArray(postData.comments)) {
+            postData.comments = [];
+          }
+          // Compatibilidade com posts antigos
+          if (postData.imageBase64 && !Array.isArray(postData.imageBase64)) {
+            postData.imageBase64 = [postData.imageBase64];
+          }
+          const postEl = createPostElement(postData, postId);
+          postsContainer.appendChild(postEl);
+        });
+      } catch (error) {
+        console.error("Erro ao carregar atividades:", error.message);
+        if (error.code === "unavailable") {
+          showAlert("Sem conexão com a internet. Exibindo dados salvos localmente. Tente novamente quando a conexão for restabelecida.");
+        } else {
+          postsContainer.innerHTML = `<p style="color:#f44336; text-align:center; padding:16px;">Erro ao carregar atividades.</p>`;
+          showAlert("Erro ao carregar atividades: " + error.message);
+        }
+      }
+    }
+
+    publishForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      if (!selectedImageDataURLs.length) {
+        showAlert("Nenhuma imagem selecionada.");
+        return;
+      }
+
+      publishButton.disabled = true;
+      publishButton.textContent = "Publicando...";
+
+      try {
+        await addDoc(collection(db, "ingles"), {
+          imageBase64: selectedImageDataURLs,
+          caption: captionInput.value.trim(),
+          createdAt: serverTimestamp(),
+          likes: [],
+          comments: [],
+          activityType: "image"
+        });
+
+        publishForm.reset();
+        fileNameDisplay.textContent = "Nenhum arquivo selecionado";
+        selectedImageDataURLs = [];
+        publishButton.disabled = true;
+        publishButton.textContent = "Publicar";
+        loadPosts();
+      } catch (error) {
+        console.error("Erro ao publicar atividade:", error.message);
+        if (error.code === "unavailable") {
+          showAlert("Sem conexão com a internet. Publicação será sincronizada quando a conexão for restabelecida.");
+        } else {
+          showAlert("Erro ao publicar: " + error.message);
+        }
+        publishButton.disabled = false;
+        publishButton.textContent = "Publicar";
+      }
+    });
+
+    loadPosts();
+  </script>
+</body>
+</html>

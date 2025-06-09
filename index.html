@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudyTask - Autenticação</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(145deg, #111, #222);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .modal {
+      background: #111;
+      border-radius: 20px;
+      padding: 30px 25px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .animated-bg {
+      background: linear-gradient(270deg, #333, #444, #555, #444, #333);
+      background-size: 600% 600%;
+      animation: gradientFlow 8s ease infinite;
+    }
+
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background-color: #08f;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #06c;
+    }
+
+    #toggleLink {
+      margin-top: 12px;
+      cursor: pointer;
+      color: #ccc;
+      font-size: 14px;
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .custom-alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #222, #333, #444);
+      padding: 20px;
+      border-radius: 15px;
+      color: white;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+      z-index: 1000;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="auth-container">
+    <div class="modal animated-bg">
+      <h2 id="modal-title">Criar Conta</h2>
+      <p id="modal-desc">Você precisa criar uma conta para continuar</p>
+      <input type="email" id="email" placeholder="Seu e-mail">
+      <input type="password" id="password" placeholder="Sua senha">
+      <input type="password" id="confirmPassword" placeholder="Confirme a senha" class="hidden">
+      <button id="nextButton">Próximo</button>
+      <p id="toggleLink">Já tenho o cadastro</p>
+    </div>
+  </div>
+
+  <div class="custom-alert hidden" id="customAlert">
+    <p id="alertMessage"></p>
+    <button onclick="closeAlert()">OK</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD8Tv1kGl6Upx_iBAB6GBECarj_F38bYG8",
+      authDomain: "studytask-ad7e1.firebaseapp.com",
+      projectId: "studytask-ad7e1",
+      storageBucket: "studytask-ad7e1.appspot.com",
+      messagingSenderId: "62674745069",
+      appId: "1:62674745069:web:895dec52dc9787d0b33ee4",
+      measurementId: "G-4MXD0J65H6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const nextButton = document.getElementById("nextButton");
+    const modalTitle = document.getElementById("modal-title");
+    const modalDesc = document.getElementById("modal-desc");
+    const toggleLink = document.getElementById("toggleLink");
+
+    let isCreating = true;
+
+    toggleLink.onclick = () => {
+      isCreating = !isCreating;
+      if (isCreating) {
+        modalTitle.textContent = "Criar Conta";
+        modalDesc.textContent = "Você precisa criar uma conta para continuar";
+        confirmPassword.classList.remove("hidden");
+        nextButton.textContent = "Próximo";
+        toggleLink.textContent = "Já tenho o cadastro";
+      } else {
+        modalTitle.textContent = "Entrar";
+        modalDesc.textContent = "Acesse sua conta para continuar";
+        confirmPassword.classList.add("hidden");
+        nextButton.textContent = "Entrar";
+        toggleLink.textContent = "Criar nova conta";
+      }
+    };
+
+    nextButton.onclick = async () => {
+      if (!email.value || !password.value || (isCreating && confirmPassword.value !== password.value)) {
+        return showAlert("Preencha os campos corretamente.");
+      }
+
+      if (isCreating) {
+        try {
+          await createUserWithEmailAndPassword(auth, email.value, password.value);
+          showAlert("Sua senha será salva automaticamente.", () => {
+            isCreating = false;
+            toggleLink.onclick();
+          });
+        } catch (error) {
+          showAlert(error.message);
+        }
+      } else {
+        try {
+          await signInWithEmailAndPassword(auth, email.value, password.value);
+          window.location.href = "tela.html";
+        } catch (error) {
+          showAlert("E-mail ou senha incorretos.");
+        }
+      }
+    };
+
+    function showAlert(message, callback) {
+      const alertBox = document.getElementById("customAlert");
+      const alertMessage = document.getElementById("alertMessage");
+      alertMessage.textContent = message;
+      alertBox.classList.remove("hidden");
+      alertBox.querySelector("button").onclick = () => {
+        alertBox.classList.add("hidden");
+        if (callback) callback();
+      };
+    }
+
+    // Mantém usuário logado
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        window.location.href = "tela.html";
+      }
+    });
+
+    window.closeAlert = () => {
+      document.getElementById("customAlert").classList.add("hidden");
+    };
+  </script>
+</body>
+</html>

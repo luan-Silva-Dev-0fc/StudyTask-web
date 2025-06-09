@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">  
+<head>  
+  <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+  <title>StudyTask</title>  
+  <style>  
+    /* Temas base */  
+    body {  
+      margin: 0;  
+      font-family: Arial, sans-serif;  
+      overflow-x: hidden;  
+      transition: background-color 0.5s, color 0.5s;  
+    }  
+
+    /* Tema Preto (padrão) */  
+    body.theme-0 {  
+      --bg-color: #121212;  
+      --text-color: white;  
+      --btn-bg: #1e1e1e;  
+      --btn-hover: #333;  
+      --header-bg: linear-gradient(135deg, #1e1e1e, #2c2c2c);  
+      --header-glow: linear-gradient(270deg,   
+        #ff416c, #ff4b2b, #fcb045, #00c9ff, #845ec2, #ff6f91, #f9f871);  
+    }  
+
+    /* Tema Branco */  
+    body.theme-1 {  
+      --bg-color: #f2f2f2;  
+      --text-color: #222;  
+      --btn-bg: #ffffff;  
+      --btn-hover: #ddd;  
+      --header-bg: linear-gradient(135deg, #e0e0e0, #ffffff);  
+      --header-glow: linear-gradient(270deg,   
+        #fbc7c7, #f0a3a3, #fcc0cb, #ffd6d6, #f7b7b7, #fbc7c7);  
+    }  
+
+    /* Tema Rosa */  
+    body.theme-2 {  
+      --bg-color: #ffe6f0;  
+      --text-color: #4a0033;  
+      --btn-bg: #ffb3d9;  
+      --btn-hover: #ff99cc;  
+      --header-bg: linear-gradient(135deg, #ff99cc, #ff66b2);  
+      --header-glow: linear-gradient(270deg,   
+        #ff66b2, #ff4da6, #ff3399, #ff1a8c, #ff0080, #e60073, #cc0066);  
+    }  
+
+    /* Tema Azul */  
+    body.theme-3 {  
+      --bg-color: #e6f0ff;  
+      --text-color: #003366;  
+      --btn-bg: #99ccff;  
+      --btn-hover: #66b3ff;  
+      --header-bg: linear-gradient(135deg, #3399ff, #0066cc);  
+      --header-glow: linear-gradient(270deg,   
+        #0066cc, #005bb5, #004d99, #003d80, #002f66, #002255, #001a40);  
+    }  
+
+    /* Tema Verde */  
+    body.theme-4 {  
+      --bg-color: #e6fff2;  
+      --text-color: #004d33;  
+      --btn-bg: #66cc99;  
+      --btn-hover: #33b37e;  
+      --header-bg: linear-gradient(135deg, #33cc99, #009966);  
+      --header-glow: linear-gradient(270deg,   
+        #009966, #00804d, #006633, #004d26, #003d1a, #002e13, #00220f);  
+    }  
+
+    body {  
+      background-color: var(--bg-color);  
+      color: var(--text-color);  
+    }  
+
+    .header {  
+      position: relative;  
+      border-radius: 0 0 30px 30px;  
+      padding: 40px 20px;  
+      text-align: center;  
+      background: var(--header-bg);  
+      overflow: hidden;  
+      animation: slideDown 1s ease-out forwards;  
+      transform: translateY(-100%);  
+      opacity: 0;  
+      cursor: pointer;  
+      transition: background 0.5s;  
+      user-select: none;  
+      z-index: 1;  
+    }  
+
+    .header::before {  
+      content: "";  
+      position: absolute;  
+      top: -20px;  
+      left: -20px;  
+      right: -20px;  
+      height: 100%;  
+      z-index: -1;  
+      background: var(--header-glow);  
+      background-size: 400% 400%;  
+      filter: blur(30px);  
+      animation: var(--animation-name, gradientGlow) var(--animation-duration, 10s) ease infinite;  
+      opacity: 0.6;  
+      border-radius: 0 0 50px 50px;  
+      transition: background 0.5s, opacity 0.5s;  
+    }  
+
+    @keyframes slideDown {  
+      to {  
+        transform: translateY(0);  
+        opacity: 1;  
+      }  
+    }  
+
+    @keyframes gradientGlow {  
+      0% { background-position: 0% 50%; }  
+      50% { background-position: 100% 50%; }  
+      100% { background-position: 0% 50%; }  
+    }  
+
+    @keyframes gradientGlowFast {  
+      0% { background-position: 0% 50%; }  
+      50% { background-position: 100% 50%; }  
+      100% { background-position: 0% 50%; }  
+    }  
+
+    @keyframes gradientGlowSlow {  
+      0% { background-position: 0% 50%; }  
+      50% { background-position: 100% 50%; }  
+      100% { background-position: 0% 50%; }  
+    }  
+
+    @keyframes gradientGlowPulse {  
+      0% { background-position: 0% 50%; opacity: 0.6; }  
+      50% { background-position: 100% 50%; opacity: 0.9; }  
+      100% { background-position: 0% 50%; opacity: 0.6; }  
+    }  
+
+    .header.no-glow::before {  
+      background: none;  
+      animation: none;  
+      opacity: 0;  
+    }  
+
+    .header h1 {  
+      font-size: 6vw;  
+      font-weight: bold;  
+      margin: 0;  
+    }  
+
+    @media (min-width: 600px) {  
+      .header h1 {  
+        font-size: 2.5rem;  
+      }  
+    }  
+
+    .container {  
+      display: grid;  
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));  
+      gap: 20px;  
+      padding: 20px;  
+      max-width: 1100px;  
+      margin: auto;  
+    }  
+
+    .btn {  
+      background-color: var(--btn-bg);  
+      color: var(--text-color);  
+      border: none;  
+      padding: 20px 10px;  
+      font-size: 15px;  
+      cursor: pointer;  
+      border-radius: 16px;  
+      text-decoration: none;  
+      display: flex;  
+      flex-direction: column;  
+      align-items: center;  
+      justify-content: center;  
+      transition: transform 0.3s ease, background 0.3s ease;  
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);  
+    }  
+
+    .btn img {  
+      width: 42px;  
+      height: 42px;  
+      margin-bottom: 10px;  
+    }  
+
+    .btn:hover {  
+      background-color: var(--btn-hover);  
+      transform: scale(1.05);  
+    }  
+
+    /* Estilo do modal */  
+    .modal {  
+      display: none;  
+      position: fixed;  
+      top: 0;  
+      left: 0;  
+      width: 100%;  
+      height: 100%;  
+      background-color: rgba(0, 0, 0, 0.5);  
+      z-index: 1000;  
+      justify-content: center;  
+      align-items: center;  
+    }  
+
+    .modal-content {  
+      background-color: var(--btn-bg);  
+      color: var(--text-color);  
+      padding: 20px;  
+      border-radius: 10px;  
+      max-width: 300px;  
+      text-align: center;  
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);  
+    }  
+
+    .modal-content h2 {  
+      margin: 0 0 20px;  
+      font-size: 1.5rem;  
+    }  
+
+    .modal-content button {  
+      background-color: var(--btn-hover);  
+      color: var(--text-color);  
+      border: none;  
+      padding: 10px;  
+      margin: 5px;  
+      border-radius: 5px;  
+      cursor: pointer;  
+      width: 100%;  
+      font-size: 1rem;  
+      transition: background-color 0.3s;  
+    }  
+
+    .modal-content button:hover {  
+      background-color: var(--btn-bg);  
+    }  
+  </style>  
+</head>  
+<body class="theme-0">  
+  <div class="header" id="themeSwitcher">  
+    <h1>StudyTask</h1>  
+  </div>  
+  <div class="container">  
+    <a href="assistente.html" class="btn"><img src="admin.png" alt="">Assistente Administrativo</a>  
+    <a href="matematica.html" class="btn"><img src="ic_matematica.png" alt="">Matemática</a>  
+    <a href="portugues.html" class="btn"><img src="ic_portugues.png" alt="">Português</a>  
+    <a href="ciencias_humanas.html" class="btn"><img src="humanas.png" alt="">Ciências Humanas</a>  
+    <a href="ciencias_natureza.html" class="btn"><img src="natureza.png" alt="">Ciências da Natureza</a>  
+    <a href="Ed.fisica.html" class="btn"><img src="ed.fisicas.png" alt="">Educação Física</a>  
+    <a href="ingles.html" class="btn"><img src="ingles.png" alt="">Inglês</a>  
+    <a href="enem.html" class="btn"><img src="Enem_logo.png" alt="">Enem</a>  
+  </div>  
+
+  <!-- Modal para seleção de gradiente -->  
+  <div class="modal" id="gradientModal">  
+    <div class="modal-content">  
+      <h2>Escolha a Animação do Gradiente</h2>  
+      <button onclick="setGradientAnimation('gradientGlow', '10s')">Padrão (10s)</button>  
+      <button onclick="setGradientAnimation('gradientGlowFast', '5s')">Rápido (5s)</button>  
+      <button onclick="setGradientAnimation('gradientGlowSlow', '20s')">Lento (20s)</button>  
+      <button onclick="setGradientAnimation('gradientGlowPulse', '8s')">Pulsante (8s)</button>  
+      <button onclick="setGradientAnimation('no-glow', '0s')">Sem Gradiente</button>  
+    </div>  
+  </div>  
+
+  <script>  
+    const themes = ['theme-0', 'theme-1', 'theme-2', 'theme-3', 'theme-4'];  
+    const themeNames = ['Preto', 'Branco', 'Rosa', 'Azul', 'Verde'];  
+
+    const body = document.body;  
+    const header = document.getElementById('themeSwitcher');  
+    const modal = document.getElementById('gradientModal');  
+
+    // Carregar tema e animação salvos  
+    window.addEventListener('DOMContentLoaded', () => {  
+      let savedTheme = localStorage.getItem('theme');  
+      if (savedTheme && themes.includes(savedTheme)) {  
+        body.className = savedTheme;  
+      } else {  
+        body.className = 'theme-0'; // padrão preto  
+      }  
+
+      let savedAnimation = localStorage.getItem('gradientAnimation');  
+      let savedDuration = localStorage.getItem('gradientDuration');  
+      if (savedAnimation) {  
+        applyGradientAnimation(savedAnimation, savedDuration || '10s');  
+      } else {  
+        applyGradientAnimation('gradientGlow', '10s'); // Animação padrão ao carregar  
+      }  
+
+      updateTitleTooltip();  
+    });  
+
+    // Alternar tema clicando no título com botão esquerdo  
+    header.addEventListener('click', (e) => {  
+      if (e.button === 0 && !modal.contains(e.target)) { // Apenas clique esquerdo e fora do modal  
+        let currentTheme = themes.findIndex(t => body.classList.contains(t));  
+        let nextTheme = (currentTheme + 1) % themes.length;  
+        body.classList.remove(...themes);  
+        body.classList.add(themes[nextTheme]);  
+        localStorage.setItem('theme', themes[nextTheme]);  
+        // Reaplicar animação atual ao mudar tema  
+        let currentAnimation = localStorage.getItem('gradientAnimation') || 'gradientGlow';  
+        let currentDuration = localStorage.getItem('gradientDuration') || '10s';  
+        applyGradientAnimation(currentAnimation, currentDuration);  
+        updateTitleTooltip();  
+      }  
+    });  
+
+    // Abrir modal ao clicar com botão direito  
+    header.addEventListener('contextmenu', (e) => {  
+      e.preventDefault();  
+      modal.style.display = 'flex';  
+    });  
+
+    // Fechar modal ao clicar fora  
+    modal.addEventListener('click', (e) => {  
+      if (e.target === modal) {  
+        modal.style.display = 'none';  
+      }  
+    });  
+
+    // Função para aplicar animação de gradiente  
+    function applyGradientAnimation(animation, duration) {  
+      header.classList.remove('no-glow');  
+      if (animation === 'no-glow') {  
+        header.classList.add('no-glow');  
+        header.style.setProperty('--animation-name', 'none');  
+        header.style.setProperty('--animation-duration', '0s');  
+      } else {  
+        header.style.setProperty('--animation-name', animation);  
+        header.style.setProperty('--animation-duration', duration);  
+      }  
+      localStorage.setItem('gradientAnimation', animation);  
+      localStorage.setItem('gradientDuration', duration);  
+    }  
+
+    // Função para definir animação via modal  
+    window.setGradientAnimation = function(animation, duration) {  
+      applyGradientAnimation(animation, duration);  
+      modal.style.display = 'none';  
+    };  
+
+    // Mostrar dica com nome do tema atual ao passar mouse  
+    function updateTitleTooltip() {  
+      let currentTheme = themes.findIndex(t => body.classList.contains(t));  
+      header.title = `Tema atual: ${themeNames[currentTheme]}\nClique para mudar o tema\nBotão direito para mudar gradiente`;  
+    }  
+  </script>  
+</body>  
+</html>
